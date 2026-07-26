@@ -1,0 +1,24 @@
+{
+  "primaryCategories": [
+    {
+      "name": "Electronics",
+      "subcategories": ["Smartphones", "Laptops", "Headphones", "Smart Watches", "Cameras"]
+    },
+    {
+      "name": "Fashion",
+      "subcategories": ["Tops", "Dresses", "Jeans", "Shoes", "Accessories", "Trousers", "Coats"]
+    },
+    {
+      "name": "Home",
+      "subcategories": ["Furniture", "Decor", "Kitchen", "Bedding", "Lighting"]
+    },
+    {
+      "name": "Beauty",
+      "subcategories": ["Skincare", "Makeup", "Haircare", "Fragrances", "Tools"]
+    },
+    {
+      "name": "Sports",
+      "subcategories": ["Activewear", "Footwear", "Equipment", "Accessories", "Outdoor"]
+    }
+  ]
+}

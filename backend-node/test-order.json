@@ -1,0 +1,10 @@
+{
+  "customerId": "6a579ea5a70c2040cb8be319",
+  "items": [
+    {
+      "productId": "6a579a6304219f29ebf04221",
+      "quantity": 2
+    }
+  ],
+  "idempotencyKey": "test-checkout-001"
+}

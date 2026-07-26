@@ -1,0 +1,31 @@
+{
+  "name": "ecommerce-backend",
+  "version": "1.0.0",
+  "description": "E-Commerce Order Management & Search Service",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "worker": "node src/scripts/startWorker.js",
+    "seed:products": "node src/scripts/seedProducts.js",
+    "seed:users": "node src/scripts/seedUsers.js",
+    "seed:orders": "node src/scripts/seedOrders.js",
+    "seed:admin": "node src/scripts/seedAdmin.js",
+    "seed:departments": "node seedMissingDepartments.js"
+  },
+  "keywords": [
+    "ecommerce",
+    "mongodb",
+    "opensearch"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@opensearch-project/opensearch": "^2.2.0",
+    "bcrypt": "^6.0.0",
+    "dotenv": "^16.6.1",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.3",
+    "mongodb": "^6.10.0",
+    "mongoose": "^8.24.1"
+  }
+}

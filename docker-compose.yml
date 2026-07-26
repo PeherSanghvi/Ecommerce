@@ -1,0 +1,115 @@
+version: "3.9"
+
+services:
+  mongo:
+    image: mongo:7.0
+    container_name: ecom-mongo
+    restart: unless-stopped
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mongosh",
+          "--eval",
+          "db.adminCommand('ping')"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - ecom-net
+
+  mongo-init:
+    image: mongo:7.0
+    container_name: ecom-mongo-init
+    restart: "no"
+    depends_on:
+      mongo:
+        condition: service_healthy
+    command: >
+      mongosh --host mongo:27017 --eval "
+      try {
+        rs.status();
+        print('Replica set already initialized');
+      } catch(e) {
+        rs.initiate({
+          _id:'rs0',
+          members:[{_id:0,host:'mongo:27017'}]
+        });
+        print('Replica set initialized');
+      }"
+    networks:
+      - ecom-net
+
+  opensearch:
+    image: opensearchproject/opensearch:2.13.0
+    container_name: ecom-opensearch
+    restart: unless-stopped
+    environment:
+      discovery.type: single-node
+      DISABLE_SECURITY_PLUGIN: "true"
+      DISABLE_INSTALL_DEMO_CONFIGURATION: "true"
+      OPENSEARCH_JAVA_OPTS: "-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+      - "9600:9600"
+    volumes:
+      - opensearch-data:/usr/share/opensearch/data
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    networks:
+      - ecom-net
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: ecom-backend
+    restart: unless-stopped
+    depends_on:
+      mongo-init:
+        condition: service_completed_successfully
+      opensearch:
+        condition: service_started
+    environment:
+      MONGODB_URI: mongodb://mongo:27017/ecommerce?replicaSet=rs0
+      OPENSEARCH_HOST: opensearch
+      OPENSEARCH_PORT: 9200
+      OPENSEARCH_SCHEME: http
+      SEEDER_ENABLED: "true"
+    ports:
+      - "8080:8080"
+    networks:
+      - ecom-net
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: ecom-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "3000:80"
+    networks:
+      - ecom-net
+
+volumes:
+  mongo-data:
+  opensearch-data:
+
+networks:
+  ecom-net:
+    driver: bridge
